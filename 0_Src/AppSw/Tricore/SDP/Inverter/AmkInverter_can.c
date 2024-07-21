@@ -340,8 +340,7 @@ void AmkInverter_Start(boolean rtdFlag)
 	if(rtdFlag == TRUE)
 	{
 		/*Inverter Error Check*/
-		if(INV_FL_AMK_Actual_Values1.S.AMK_bSError | INV_FR_AMK_Actual_Values1.S.AMK_bSError |
-		    INV_RL_AMK_Actual_Values1.S.AMK_bSError | INV_RR_AMK_Actual_Values1.S.AMK_bSError)
+		if(INV_FL_AMK_Actual_Values1.S.AMK_bSError | INV_FR_AMK_Actual_Values1.S.AMK_bSError)
 		{
 			AmkInverterError = TRUE;
 		}
@@ -363,8 +362,7 @@ void AmkInverter_Start(boolean rtdFlag)
 			}
 
 			/*When the errors are cleared -> To the state S1*/
-			if((INV_FL_AMK_Actual_Values1.S.AMK_bSystemReady & INV_FR_AMK_Actual_Values1.S.AMK_bSystemReady &
-			       INV_RL_AMK_Actual_Values1.S.AMK_bSystemReady & INV_RR_AMK_Actual_Values1.S.AMK_bSystemReady))
+			if((INV_FL_AMK_Actual_Values1.S.AMK_bSystemReady & INV_FR_AMK_Actual_Values1.S.AMK_bSystemReady))
 			{
 				SWITCH.ErrorReset = FALSE;
 				AmkState = AmkState_S1;
@@ -375,8 +373,7 @@ void AmkInverter_Start(boolean rtdFlag)
 		{
 			if(alreadyOn == 0)
 			{
-				if(!(INV_FL_AMK_Actual_Values1.S.AMK_bSystemReady & INV_FR_AMK_Actual_Values1.S.AMK_bSystemReady &
-				       INV_RL_AMK_Actual_Values1.S.AMK_bSystemReady & INV_RR_AMK_Actual_Values1.S.AMK_bSystemReady))
+				if(!(INV_FL_AMK_Actual_Values1.S.AMK_bSystemReady & INV_FR_AMK_Actual_Values1.S.AMK_bSystemReady))
 				{
 					AmkState = AmkState_S0;
 				}
@@ -390,8 +387,7 @@ void AmkInverter_Start(boolean rtdFlag)
 				SWITCH.posTorquelimit = 0;
 
 				SWITCH.DCon = 1;
-				if(INV_FL_AMK_Actual_Values1.S.AMK_bDcOn & INV_FR_AMK_Actual_Values1.S.AMK_bDcOn &
-				    INV_RL_AMK_Actual_Values1.S.AMK_bDcOn & INV_RR_AMK_Actual_Values1.S.AMK_bDcOn)
+				if(INV_FL_AMK_Actual_Values1.S.AMK_bDcOn & INV_FR_AMK_Actual_Values1.S.AMK_bDcOn)
 				{
 					AmkState = AmkState_S2;
 				}
@@ -445,9 +441,7 @@ void AmkInverter_Start(boolean rtdFlag)
 			SWITCH.Enable = 1;
 			SWITCH.inverter = 1;
 			if(INV_FL_AMK_Actual_Values1.S.AMK_bInverterOn && INV_FR_AMK_Actual_Values1.S.AMK_bInverterOn &&
-			    INV_RL_AMK_Actual_Values1.S.AMK_bInverterOn && INV_RR_AMK_Actual_Values1.S.AMK_bInverterOn &&
-			    INV_FL_AMK_Actual_Values1.S.AMK_bQuitInverterOn && INV_FR_AMK_Actual_Values1.S.AMK_bQuitInverterOn &&
-			    INV_RL_AMK_Actual_Values1.S.AMK_bQuitInverterOn && INV_RR_AMK_Actual_Values1.S.AMK_bQuitInverterOn)
+			    INV_FL_AMK_Actual_Values1.S.AMK_bQuitInverterOn && INV_FR_AMK_Actual_Values1.S.AMK_bQuitInverterOn)
 			{
 				AmkState = AmkState_S5;
 			}
@@ -468,9 +462,7 @@ void AmkInverter_Start(boolean rtdFlag)
 
 			/*Check again*/
 			if(INV_FL_AMK_Actual_Values1.S.AMK_bInverterOn && INV_FR_AMK_Actual_Values1.S.AMK_bInverterOn &&
-			    INV_RL_AMK_Actual_Values1.S.AMK_bInverterOn && INV_RR_AMK_Actual_Values1.S.AMK_bInverterOn &&
-			    INV_FL_AMK_Actual_Values1.S.AMK_bQuitInverterOn && INV_FR_AMK_Actual_Values1.S.AMK_bQuitInverterOn &&
-			    INV_RL_AMK_Actual_Values1.S.AMK_bQuitInverterOn && INV_RR_AMK_Actual_Values1.S.AMK_bQuitInverterOn)
+			    INV_FL_AMK_Actual_Values1.S.AMK_bQuitInverterOn && INV_FR_AMK_Actual_Values1.S.AMK_bQuitInverterOn)
 			{
 				SWITCH.BE2 = 1;
 				SWITCH.posTorquelimit = AMK_TORQUE_LIM;
