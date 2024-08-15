@@ -197,7 +197,7 @@ void SDP_PedalBox_init(void)
 		HLD_AdcForceStart(APPS1.adcChannel.channel.group);
 	}
 	// BPPS0
-	// 0~5V 0~2000psi linear
+	// 0.5~4.5V 0~2500psi linear
 	config_adc.adcConfig.lpf.activated = TRUE;
 	config_adc.adcConfig.lpf.config.gain = 1;
 	config_adc.adcConfig.lpf.config.cutOffFrequency = 10000 / (2 * IFX_PI * (1e-2f));

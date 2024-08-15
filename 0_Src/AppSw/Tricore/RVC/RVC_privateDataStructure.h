@@ -64,7 +64,7 @@ typedef struct
 	RVC_Gpi_t airNegative;
 	RVC_Gpi_t brakePressureOn;
 	RVC_Gpi_t brakeSwitch;
-	RVC_Gpi_t tsalOn;
+	RVC_Gpi_t tsalOff;
 	RVC_Gpi_t sdcSenBspd;
 	RVC_Gpi_t sdcSenImd;
 	RVC_Gpi_t sdcSenAms;

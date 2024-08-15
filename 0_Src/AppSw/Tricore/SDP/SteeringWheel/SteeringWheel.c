@@ -2,6 +2,7 @@
  * SteeringWheel.h
  * Created on: 2020.08.05
  * Author: Dua
+ * 
  */
 
 
@@ -16,8 +17,8 @@
 
 
 /**************************** Macro **********************************/
-#define _MAX_BP_PER_BRAKE_LINE_ 75.0
-#define _MIN_BP_PER_BRAKE_LINE_ 5.0
+#define _MAX_BP_PER_BRAKE_LINE_ 55  // 95.8bar
+#define _MIN_BP_PER_BRAKE_LINE_ 5.0	// 0bar
 
 /************************* Data Structures ***************************/
 typedef struct 
@@ -103,7 +104,7 @@ void SteeringWheel_run_xms_c2(void)
 		brakePercentage = 100.0;
 	}
 	else {
-		brakePercentage = (double)SteeringWheel_public.data.bpps / (_MAX_BP_PER_BRAKE_LINE_);
+		brakePercentage = (double)SteeringWheel_public.data.bpps / (_MAX_BP_PER_BRAKE_LINE_ - _MIN_BP_PER_BRAKE_LINE_);
 		brakePercentage *= 100;
 	}
 	SteeringWheel.canMsg2.S.bpps = (uint16)(brakePercentage * 100);
@@ -112,12 +113,10 @@ void SteeringWheel_run_xms_c2(void)
 
 	SteeringWheel.canMsg3.S.inverterFLTemp = INV_FL_AMK_Actual_Values2.S.AMK_TempInverter;
 	SteeringWheel.canMsg3.S.motorFLTemp = INV_FL_AMK_Actual_Values2.S.AMK_TempMotor;
-	SteeringWheel.canMsg3.S.inverterRLTemp = INV_RL_AMK_Actual_Values2.S.AMK_TempInverter;
-	SteeringWheel.canMsg3.S.motorRLTemp = INV_RL_AMK_Actual_Values2.S.AMK_TempMotor;
-	SteeringWheel.canMsg3.S.inverterRRTemp = INV_RR_AMK_Actual_Values2.S.AMK_TempInverter;
-	SteeringWheel.canMsg3.S.motorRRTemp = INV_RR_AMK_Actual_Values2.S.AMK_TempMotor;
 	SteeringWheel.canMsg3.S.inverterFRTemp = INV_FR_AMK_Actual_Values2.S.AMK_TempInverter;
 	SteeringWheel.canMsg3.S.motorFRTemp = INV_FR_AMK_Actual_Values2.S.AMK_TempMotor;
+	SteeringWheel.canMsg3.S.packCurrent = OrionBms2.msg1.packCurrent;
+	SteeringWheel.canMsg3.S.packVoltage = OrionBms2.msg1.packVoltage;
 
 	/* Set the messages */
 	CanCommunication_setMessageData(SteeringWheel.canMsg1.U[0], SteeringWheel.canMsg1.U[1], &SteeringWheel.msgObj1);

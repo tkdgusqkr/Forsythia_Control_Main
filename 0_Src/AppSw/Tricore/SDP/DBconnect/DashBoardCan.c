@@ -186,7 +186,7 @@ void SDP_DashBoardCan_run_10ms(void)
 	DashBoard_canMsg0.B.SdcSen = DashBoard_public.data.sdcSenFinal;
 	DashBoard_canMsg0.B.tsalOn = DashBoard_public.data.tsalOn;
 
-    CanCommunication_setMessageData(DashBoard_canMsg0.data[0], DashBoard_canMsg0.data[1], &DashBoard_msgObj0);
+	CanCommunication_setMessageData(DashBoard_canMsg0.data[0], DashBoard_canMsg0.data[1], &DashBoard_msgObj0);
     CanCommunication_transmitMessage(&DashBoard_msgObj0);
 }
 

@@ -85,6 +85,7 @@ void Task_core2_1ms(void)
 
 	SDP_PedalBox_run_1ms();
 	SDP_SteeringAngleAdc_run();
+	SDP_Accumulator_run_10ms();
 
 	AmkInverter_can_Run();
 

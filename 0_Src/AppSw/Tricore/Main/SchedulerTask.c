@@ -177,6 +177,7 @@ void Task_init (void)
 		SDP_Cooling_init();
 		SDP_SteeringAngleAdc_init();
 		SDP_DashBoardCan_init();
+		SDP_Accumulator_init();
 	}
 	/* Hmm... */
 	{

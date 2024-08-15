@@ -68,6 +68,13 @@ AmkActualValues2_log_t INV_RL_AMK_Actual_Values2_log;
 AmkActualValues2_log_t INV_RR_AMK_Actual_Values2_log;
 AmkActualValues2_log_t INV_FR_AMK_Actual_Values2_log;
 
+IFX_EXTERN boolean chg0 = FALSE;
+IFX_EXTERN boolean chg1 = FALSE;
+IFX_EXTERN boolean chg2 = FALSE;
+IFX_EXTERN boolean chg3 = FALSE;
+IFX_EXTERN boolean chg4 = FALSE;
+IFX_EXTERN boolean chg5 = FALSE;
+
 void AmkInverter_can_init(void);
 void AmkInverter_can_Run(void);
 void AmkInverter_can_write(amkSetpoint1 *INV, CanCommunication_Message TC, uint16 tV);
