@@ -114,6 +114,11 @@ void Task_core2_1ms(void)
 	// AmkInverter_writeMessage(value,value);
 	// AmkInverter_writeMessage2(value,value);
 
+	if(valueFl < 0)	valueFl = 0;
+	if(valueFr < 0)	valueFr = 0;
+	if(valueRl < 0)	valueRl = 0;
+	if(valueRr < 0)	valueRr = 0;
+
 
 	AmkInverter_writeMessage(valueFl,valueFr);
 	AmkInverter_writeMessage2(valueRl,valueRr);

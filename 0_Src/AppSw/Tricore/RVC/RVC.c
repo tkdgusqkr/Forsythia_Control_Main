@@ -75,9 +75,9 @@ TODO:
 #define PEDAL_BRAKE_ON_THRESHOLD 10
 #define REGEN_MUL	1	//2
 
-//#define POWER_LIM				80000	//80kW
+// #define POWER_LIM				80000	//80kW
 #define POWER_LIM				40000	//80kW
-#define CURRENT_LIM_SET_VAL		10		//10A
+// #define CURRENT_LIM_SET_VAL		10		//10A
 #define CURRENT_LIM_SET_VAL 	5       //5A
 
 #define TV1PGAIN 0.001
