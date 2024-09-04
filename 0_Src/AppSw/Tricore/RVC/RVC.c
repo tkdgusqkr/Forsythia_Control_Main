@@ -75,8 +75,10 @@ TODO:
 #define PEDAL_BRAKE_ON_THRESHOLD 10
 #define REGEN_MUL	1	//2
 
-#define POWER_LIM				80000	//80kW
-#define CURRENT_LIM_SET_VAL		10		//10A
+// #define POWER_LIM				80000	//80kW
+#define POWER_LIM				40000	//80kW
+// #define CURRENT_LIM_SET_VAL		10		//10A
+#define CURRENT_LIM_SET_VAL 	5       //5A
 
 #define TV1PGAIN 0.001
 
@@ -153,7 +155,7 @@ IFX_INLINE void RVC_torqueSignalGeneration(void);
 IFX_INLINE void RVC_updatePwmSignal(void);
 IFX_INLINE void RVC_updateSharedVariable(void);
 
-/********************* Function Implementation ***********************/
+    /********************* Function Implementation ***********************/
 void RVC_init(void)
 {
 	RVC_initAdcSensor();
@@ -232,7 +234,7 @@ void RVC_run_10ms(void)
 	RVC_pollGpi(&RVC.airNegative);
 	RVC_pollGpi(&RVC.brakePressureOn);
 	RVC_pollGpi(&RVC.brakeSwitch);
-	RVC_pollGpi(&RVC.tsalOn);
+	RVC_pollGpi(&RVC.tsalOff);
 	RVC_pollGpi(&RVC.sdcSenBspd);
 	RVC_pollGpi(&RVC.sdcSenImd);
 	RVC_pollGpi(&RVC.sdcSenAms);
@@ -382,7 +384,7 @@ IFX_STATIC void RVC_initGpio(void)
 	gpioInputConfig.bufferLen = Gpio_Debounce_BufferLength_10;
 	gpioInputConfig.inputMode = IfxPort_InputMode_noPullDevice;
 	gpioInputConfig.port = &TSAL_RED_ON_5V;
-	Gpio_Debounce_initInput(&RVC.tsalOn.debounce, &gpioInputConfig);
+	Gpio_Debounce_initInput(&RVC.tsalOff.debounce, &gpioInputConfig);
 
 	gpioInputConfig.bufferLen = Gpio_Debounce_BufferLength_10;
 	gpioInputConfig.inputMode = IfxPort_InputMode_noPullDevice;
@@ -598,22 +600,22 @@ IFX_INLINE void RVC_updateReadyToDriveSignal(void)
 		IfxPort_setPinLow(FWD_OUT.port, FWD_OUT.pinIndex);
 	}
 	*/
-	static AmkState_t AmkState = AmkState_S0;
+	static AmkState_t curAmkState = AmkState_S0;
 	static AmkState_t pastAmkState = AmkState_S0;
 	static boolean rtds = FALSE;
 
 	/*Store past AMK State*/
-	pastAmkState = AmkState;
+	pastAmkState = curAmkState;
 
 	/*Get current AMK State*/
 	while(IfxCpu_acquireMutex(&AmkInverterPublic.mutex));	//Wait for the mutex
 	{
-		AmkState = AmkInverterPublic.r2d;
+		curAmkState = AmkInverterPublic.r2d;
 		IfxCpu_releaseMutex(&AmkInverterPublic.mutex);
 	}
 
 	/*Update RTD state*/
-	if(AmkState == AmkState_RTD)
+	if(curAmkState == AmkState_RTD)
 	{
 		RVC.readyToDrive = RVC_ReadyToDrive_status_run;
 	}
@@ -623,26 +625,42 @@ IFX_INLINE void RVC_updateReadyToDriveSignal(void)
 	}
 
 	/*Invoke RTDS*/
-	if((pastAmkState != AmkState_RTD) && (AmkState == AmkState_RTD))
+	if((pastAmkState != AmkState_RTD) && (curAmkState == AmkState_RTD))
 	{
+		// Turn off the drivetrain befor entering the ready-to-drive sound
+		RVC.torque.controlled = 0;
+
+		// Enter ready-to-drive sound
 		rtds = TRUE;
 	}
 
 	if(rtds)
 	{
-		if(RVC.RTDS_Tick < RTDS_TIME)
-		{
-			RVC.RTDS_Tick++;
-			IfxPort_setPinLow(R2DOUT.port, R2DOUT.pinIndex);
-			// IfxPort_setPinHigh(FWD_OUT.port, FWD_OUT.pinIndex);
-		}
-		else
-		{	
-			rtds = FALSE;
-			RVC.RTDS_Tick = 0;
-			IfxPort_setPinHigh(R2DOUT.port, R2DOUT.pinIndex);
-			// IfxPort_setPinLow(FWD_OUT.port, FWD_OUT.pinIndex);
-		}
+		 if(RVC.RTDS_Tick < RTDS_TIME)
+		 {
+		 	RVC.RTDS_Tick++;
+		 	IfxPort_setPinLow(R2DOUT.port, R2DOUT.pinIndex);
+		 	// IfxPort_setPinHigh(FWD_OUT.port, FWD_OUT.pinIndex);
+		 }
+		 else
+		 {
+		 	rtds = FALSE;
+		 	RVC.RTDS_Tick = 0;
+		 	IfxPort_setPinHigh(R2DOUT.port, R2DOUT.pinIndex);
+		 	// IfxPort_setPinLow(FWD_OUT.port, FWD_OUT.pinIndex);
+		 }
+
+		// // Make a sound for 3 seconds
+		// while(RVC.RTDS_Tick < RTDS_TIME)
+		// {
+		// 	RVC.RTDS_Tick++;
+		// 	IfxPort_setPinLow(R2DOUT.port, R2DOUT.pinIndex);
+		// }
+
+		// // Reset rtds
+		// rtds = FALSE;
+		// RVC.RTDS_Tick = 0;
+		// IfxPort_setPinHigh(R2DOUT.port, R2DOUT.pinIndex);
 	}
 }
 
@@ -940,7 +958,7 @@ IFX_INLINE void VariableUpdateRoutine_dashboard(void)
 	DashBoard_public.shared.data.bspdOk = RVC.bspdOk.value;
 	DashBoard_public.shared.data.sdcSenFinal = RVC.sdcSenFinal.value;
 	DashBoard_public.shared.data.brakeOn = RVC.brakeOn.tot;
-	DashBoard_public.shared.data.tsalOn = RVC.tsalOn.value;
+	DashBoard_public.shared.data.tsalOn = !RVC.tsalOff.value;
 }
 
 volatile uint32 updateErrorCount_steeringWheel = 0;

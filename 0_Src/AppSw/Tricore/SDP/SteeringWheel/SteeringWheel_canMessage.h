@@ -48,14 +48,20 @@ typedef union
 {
 	struct 
 	{
-		uint8 inverterFLTemp;		//byte0;		//Inverter
-		uint8 motorFLTemp;			//byte1;		//Inverter
-		uint8 inverterRLTemp;        //byte2;		//Inverter
-		uint8 motorRLTemp;			//byte3;		//Inverter
-		uint8 inverterRRTemp;		//byte0;		//Inverter
-		uint8 motorRRTemp;			//byte1;		//Inverter
-		uint8 inverterFRTemp;        //byte2;		//Inverter
-		uint8 motorFRTemp;			//byte3;		//Inverter
+		// uint8 inverterFLTemp;		//byte0;		//Inverter
+		// uint8 motorFLTemp;			//byte1;		//Inverter
+		// uint8 inverterRLTemp;        //byte2;		//Inverter
+		// uint8 motorRLTemp;			//byte3;		//Inverter
+		// uint8 inverterRRTemp;		//byte0;		//Inverter
+		// uint8 motorRRTemp;			//byte1;		//Inverter
+		// uint8 inverterFRTemp;        //byte2;		//Inverter
+		// uint8 motorFRTemp;			//byte3;		//Inverter
+		uint8 inverterFLTemp;       // byte0;		//Inverter
+		uint8 motorFLTemp;          // byte1;		//Inverter
+		uint8 inverterFRTemp;       // byte2;		//Inverter
+		uint8 motorFRTemp;          // byte3;		//Inverter
+		uint16 packCurrent;			// byte4~5;		//BMS
+		uint16 packVoltage;			// byte6~7;		//BMS
 	}S;
 	uint32 U[2];
 }SteeringWheel_canMsg3_t;

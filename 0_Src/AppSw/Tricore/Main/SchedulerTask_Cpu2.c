@@ -85,6 +85,7 @@ void Task_core2_1ms(void)
 
 	SDP_PedalBox_run_1ms();
 	SDP_SteeringAngleAdc_run();
+	SDP_Accumulator_run_10ms();
 
 	AmkInverter_can_Run();
 
@@ -112,6 +113,11 @@ void Task_core2_1ms(void)
 
 	// AmkInverter_writeMessage(value,value);
 	// AmkInverter_writeMessage2(value,value);
+
+	if(valueFl < 0)	valueFl = 0;
+	if(valueFr < 0)	valueFr = 0;
+	if(valueRl < 0)	valueRl = 0;
+	if(valueRr < 0)	valueRr = 0;
 
 
 	AmkInverter_writeMessage(valueFl,valueFr);
