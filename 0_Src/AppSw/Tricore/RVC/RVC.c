@@ -776,10 +776,14 @@ IFX_INLINE void RVC_torqueSatuation(void)
 	{
 		RVC.torque.controlled = 100;
 	}
-	else if(RVC.torque.controlled < -100)
+	else if(RVC.torque.controlled < 0)
 	{
-		RVC.torque.controlled = -100;
+		RVC.torque.controlled = 0;
 	}
+	// else if(RVC.torque.controlled < -100)
+	// {
+	// 	RVC.torque.controlled = -100;
+	// }
 	else if(RVC.torque.desired < RVC.torque.controlled)
 	{
 		RVC.torque.controlled = RVC.torque.desired;
@@ -815,21 +819,25 @@ IFX_INLINE void RVC_torqueSignalGeneration(void)
 	while(IfxCpu_acquireMutex(&AmkInverterPublic.mutex));	//Wait for the mutex
 	{
 		if(RVC.readyToDrive == RVC_ReadyToDrive_status_run)
-			AmkInverterPublic.r2d = TRUE;
+		{
+			// AmkInverterPublic.r2d = AmkState_RTD;
+
+			AmkInverterPublic.fl = RVC.torque.frontLeft;
+			AmkInverterPublic.fr = RVC.torque.frontRight;
+			AmkInverterPublic.rl = RVC.torque.rearLeft;
+			AmkInverterPublic.rr = RVC.torque.rearRight;
+
+			AmkInverterPublic.brakeOn = RVC.brakeOn.tot;
+		}
 		else
-			AmkInverterPublic.r2d = FALSE;
-		
+		{
+			AmkInverterPublic.r2d = AmkState_S0;
+		}
+
 		// AmkInverterPublic.fl = RVC.torque.controlled;
 		// AmkInverterPublic.fr = RVC.torque.controlled;
 		// AmkInverterPublic.rl = RVC.torque.controlled;
 		// AmkInverterPublic.rr = RVC.torque.controlled;
-
-		AmkInverterPublic.fl = RVC.torque.frontLeft;
-		AmkInverterPublic.fr = RVC.torque.frontRight;
-		AmkInverterPublic.rl = RVC.torque.rearLeft;
-		AmkInverterPublic.rr = RVC.torque.rearRight;
-
-		AmkInverterPublic.brakeOn = RVC.brakeOn.tot;
 
 		IfxCpu_releaseMutex(&AmkInverterPublic.mutex);
 	}

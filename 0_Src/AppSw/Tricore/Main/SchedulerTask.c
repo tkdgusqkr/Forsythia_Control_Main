@@ -183,7 +183,7 @@ void Task_init (void)
 	{
 		// AccumulatorManager_master_init();
 		AmkInverter_can_init();
-		AMKInverter_initLoggingMessage();
+		AMKInverter_log_init();
 		OrionBms2_init();
 		RVC_init();
 		SteeringWheel_init();
