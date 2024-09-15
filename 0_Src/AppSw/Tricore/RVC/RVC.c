@@ -45,6 +45,8 @@ TODO:
 #include "AmkInverter_can.h"
 #include "DashBoardCan.h"
 
+#include "CanCommunication.h"
+
 /**************************** Macro **********************************/
 #define PWMFREQ 5000 // PWM frequency in Hz
 #define PWMVREF 5.0  // PWM reference voltage (On voltage)
@@ -110,6 +112,7 @@ TODO:
 
 /*********************** Global Variables ****************************/
 static const float32 frontDist_initial = 0.35f;
+// static boolean rtds = FALSE;
 
 RVC_t RVC = 
 {
@@ -600,9 +603,9 @@ IFX_INLINE void RVC_updateReadyToDriveSignal(void)
 		IfxPort_setPinLow(FWD_OUT.port, FWD_OUT.pinIndex);
 	}
 	*/
+	static boolean rtds = FALSE;
 	static AmkState_t curAmkState = AmkState_S0;
 	static AmkState_t pastAmkState = AmkState_S0;
-	static boolean rtds = FALSE;
 
 	/*Store past AMK State*/
 	pastAmkState = curAmkState;
@@ -627,7 +630,7 @@ IFX_INLINE void RVC_updateReadyToDriveSignal(void)
 	/*Invoke RTDS*/
 	if((pastAmkState != AmkState_RTD) && (curAmkState == AmkState_RTD))
 	{
-		// Turn off the drivetrain befor entering the ready-to-drive sound
+		// // Turn off the drivetrain befor entering the ready-to-drive sound
 		RVC.torque.controlled = 0;
 
 		// Enter ready-to-drive sound
@@ -648,6 +651,8 @@ IFX_INLINE void RVC_updateReadyToDriveSignal(void)
 		 	RVC.RTDS_Tick = 0;
 		 	IfxPort_setPinHigh(R2DOUT.port, R2DOUT.pinIndex);
 		 	// IfxPort_setPinLow(FWD_OUT.port, FWD_OUT.pinIndex);
+			
+		 	CanCommunication_init();
 		 }
 
 		// // Make a sound for 3 seconds
@@ -682,7 +687,11 @@ IFX_INLINE void RVC_slipComputation(void)
 
 IFX_INLINE void RVC_getTorqueRequired(void)
 {
-	if(SDP_PedalBox.apps.isValueOk)		//APPS Plausibility check
+	// if(rtds != TRUE && SDP_PedalBox.apps.isValueOk)		//APPS Plausibility check
+	// {
+	// 	RVC.torque.controlled = (RVC.torque.desired = RVC_PedalMap_lut_getResult(SDP_PedalBox.apps.pps));
+	// }
+	if(SDP_PedalBox.apps.isValueOk) // APPS Plausibility check
 	{
 		RVC.torque.controlled = (RVC.torque.desired = RVC_PedalMap_lut_getResult(SDP_PedalBox.apps.pps));
 	}
@@ -814,10 +823,8 @@ IFX_INLINE void RVC_torqueSignalGeneration(void)
 #ifdef AMK_TEST
 	while(IfxCpu_acquireMutex(&AmkInverterPublic.mutex));	//Wait for the mutex
 	{
-		if(RVC.readyToDrive == RVC_ReadyToDrive_status_run)
-			AmkInverterPublic.r2d = TRUE;
-		else
-			AmkInverterPublic.r2d = FALSE;
+		if(RVC.readyToDrive != RVC_ReadyToDrive_status_run)
+			AmkInverterPublic.r2d = AmkState_S0;
 		
 		// AmkInverterPublic.fl = RVC.torque.controlled;
 		// AmkInverterPublic.fr = RVC.torque.controlled;

@@ -74,6 +74,26 @@ void CanCommunication_init(void)
 	IfxMultican_Can_Node_init(&CanCommunication_canNode2, &canNodeConfig);
 }
 
+void CanCommunication_0_init(void)
+{
+	/* Can Module initialiazation */
+	IfxMultican_Can_Config canConfig;
+	IfxMultican_Can_initModuleConfig(&canConfig, &MODULE_CAN);
+	IfxMultican_Can_initModule(&CanCommunication_canModule, &canConfig);
+
+	/* Can node0 initialization */
+	IfxMultican_Can_NodeConfig canNodeConfig;
+	IfxMultican_Can_Node_initConfig(&canNodeConfig, &CanCommunication_canModule);
+
+	canNodeConfig.baudrate = 1000000; // 1Mbps
+	canNodeConfig.nodeId = IfxMultican_NodeId_0;
+	canNodeConfig.rxPin = &CAN0NODE0IN;
+	canNodeConfig.rxPinMode = IfxPort_InputMode_pullUp;
+	canNodeConfig.txPin = &CAN0NODE0OUT;
+	canNodeConfig.txPinMode = IfxPort_OutputMode_pushPull;
+	IfxMultican_Can_Node_init(&CanCommunication_canNode0, &canNodeConfig);
+}
+
 void CanCommunication_initMessage(CanCommunication_Message* ccMsg, CanCommunication_Message_Config* config)
 {
 	IfxMultican_Can_MsgObj* obj 	= &ccMsg->obj;

@@ -44,11 +44,11 @@
 #define V0_CONST_A 		-9.2980636458f
 #define V0_CONST_B		100.7315829998f
 #elif PPSMODE == ADC
-// #define A0STT		(1.15f)
-// #define A0END		(3.20f)
+#define A0STT		(1.15f)
+#define A0END		(3.20f)
 
-// #define A1STT		(0.74f)
-// #define A1END		(2.00f)
+#define A1STT		(0.74f)
+#define A1END		(2.00f)
 #endif
 
 #define PBERRORLIMIT	10
@@ -158,44 +158,66 @@ void SDP_PedalBox_init(void)
 		config.reversed = FALSE;
 		SDP_PedalBox_initSensor(&SDP_PedalBox_pps.bpps1, &config);
 	#elif PPSMODE == ADC
+	// AdcSensor_Config config_adc;
+	// // APPS0
+	// {
+	// 	float32 throttle_released_voltage = 3.48f; // max 5.0
+	// 	float32 throttle_full_voltage = 1.5f;
+
+	// 	config_adc.adcConfig.lpf.config.cutOffFrequency = 10000 / (2.0 * IFX_PI * 0.05); // FIXME: Adjust time constant
+	// 	config_adc.adcConfig.lpf.config.gain = 1;
+	// 	config_adc.adcConfig.lpf.config.samplingTime = 0.001;
+	// 	config_adc.adcConfig.lpf.activated = TRUE;
+
+	// 	config_adc.adcConfig.channelIn = &HLD_Vadc_P20_6_G2CH4_AD7;
+	// 	// config_adc.tfConfig.a = 28.0;
+	// 	// config_adc.tfConfig.b = 4.8;
+	// 	// throttle percent(0~100) = ADC voltage * a + b
+	// 	config_adc.tfConfig.a = (100) / (throttle_full_voltage - throttle_released_voltage);
+	// 	config_adc.tfConfig.b =
+	// 	    (throttle_released_voltage) * ((100) / (throttle_released_voltage - throttle_full_voltage));
+
+	// 	config_adc.isOvervoltageProtected = TRUE;
+
+	// 	AdcSensor_initSensor(&APPS0, &config_adc);
+	// 	HLD_AdcForceStart(APPS0.adcChannel.channel.group);
+	// }
+	// // APPS1
+	// {
+	// 	float32 throttle_released_voltage = 2.22f; // max 3.3
+	// 	float32 throttle_full_voltage = 0.93f;
+
+	// 	config_adc.adcConfig.channelIn = &HLD_Vadc_P23_4_G0CH0_AD11;
+	// 	// config_adc.tfConfig.a = 42.5;
+	// 	// config_adc.tfConfig.b = 4.8;
+	// 	config_adc.tfConfig.a = (100) / (throttle_full_voltage - throttle_released_voltage);
+	// 	config_adc.tfConfig.b =
+	// 	    (throttle_released_voltage) * ((100) / (throttle_released_voltage - throttle_full_voltage));
+	// 	AdcSensor_initSensor(&APPS1, &config_adc);
+	// 	HLD_AdcForceStart(APPS1.adcChannel.channel.group);
+	// }
 	AdcSensor_Config config_adc;
 	// APPS0
-	{
-		float32 throttle_released_voltage = 3.48f; // max 5.0
-		float32 throttle_full_voltage = 1.5f;
+	config_adc.adcConfig.lpf.config.cutOffFrequency = 10000 / (2.0 * IFX_PI * 0.05); // FIXME: Adjust time constant
+	config_adc.adcConfig.lpf.config.gain = 1;
+	config_adc.adcConfig.lpf.config.samplingTime = 0.001;
+	config_adc.adcConfig.lpf.activated = TRUE;
 
-		config_adc.adcConfig.lpf.config.cutOffFrequency = 10000 / (2.0 * IFX_PI * 0.05); // FIXME: Adjust time constant
-		config_adc.adcConfig.lpf.config.gain = 1;
-		config_adc.adcConfig.lpf.config.samplingTime = 0.001;
-		config_adc.adcConfig.lpf.activated = TRUE;
+	config_adc.adcConfig.channelIn = &HLD_Vadc_P20_6_G2CH4_AD7;
+	config_adc.tfConfig.a = 100.0f / (A0END - A0STT);
+	config_adc.tfConfig.b = config_adc.tfConfig.a * (-A0STT);
 
-		config_adc.adcConfig.channelIn = &HLD_Vadc_P20_6_G2CH4_AD7;
-		// config_adc.tfConfig.a = 28.0;
-		// config_adc.tfConfig.b = 4.8;
-		// throttle percent(0~100) = ADC voltage * a + b
-		config_adc.tfConfig.a = (100) / (throttle_full_voltage - throttle_released_voltage);
-		config_adc.tfConfig.b =
-		    (throttle_released_voltage) * ((100) / (throttle_released_voltage - throttle_full_voltage));
+	config_adc.isOvervoltageProtected = TRUE;
 
-		config_adc.isOvervoltageProtected = TRUE;
+	AdcSensor_initSensor(&APPS0, &config_adc);
+	HLD_AdcForceStart(APPS0.adcChannel.channel.group);
 
-		AdcSensor_initSensor(&APPS0, &config_adc);
-		HLD_AdcForceStart(APPS0.adcChannel.channel.group);
-	}
 	// APPS1
-	{
-		float32 throttle_released_voltage = 2.22f; // max 3.3
-		float32 throttle_full_voltage = 0.93f;
-
-		config_adc.adcConfig.channelIn = &HLD_Vadc_P23_4_G0CH0_AD11;
-		// config_adc.tfConfig.a = 42.5;
-		// config_adc.tfConfig.b = 4.8;
-		config_adc.tfConfig.a = (100) / (throttle_full_voltage - throttle_released_voltage);
-		config_adc.tfConfig.b =
-		    (throttle_released_voltage) * ((100) / (throttle_released_voltage - throttle_full_voltage));
-		AdcSensor_initSensor(&APPS1, &config_adc);
-		HLD_AdcForceStart(APPS1.adcChannel.channel.group);
-	}
+	config_adc.adcConfig.channelIn = &HLD_Vadc_P23_4_G0CH0_AD11;
+	config_adc.tfConfig.a = 100.0f / (A1END - A1STT);
+	config_adc.tfConfig.b = config_adc.tfConfig.a * (-A1STT);
+	AdcSensor_initSensor(&APPS1, &config_adc);
+	HLD_AdcForceStart(APPS1.adcChannel.channel.group);
 	// BPPS0
 	// 0.5~4.5V 0~2500psi linear
 	config_adc.adcConfig.lpf.activated = TRUE;

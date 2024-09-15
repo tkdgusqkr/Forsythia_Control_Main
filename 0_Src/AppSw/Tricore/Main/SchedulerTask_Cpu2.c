@@ -155,7 +155,6 @@ IFX_STATIC void Task_core2_10ms_slot0(void)
 	2143 -> 214.3% of nominal torque 21Nm
 	maby 21Nm is max by datasheet graph
 	*/
-	AMKInverter_runLogging();
 
 }
 

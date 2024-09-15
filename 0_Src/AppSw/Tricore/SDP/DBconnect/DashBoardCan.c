@@ -157,17 +157,21 @@ void SDP_DashBoardCan_run_10ms(void)
 	}
 	else	//(RTD_flag == TRUE) 
 	{
-		testCnt++;
-		if(DashBoard_canMsg1.B.StartBtn)
-		{
-			RTD_cnt++;
-			if(RTD_cnt > rtdCntTh)
-			{
-				RTD_flag = FALSE;
-				RTD_cnt = 0;
-			}
-		}
-		else if(DashBoard_public.data.tsalOn == FALSE)
+		// testCnt++;
+		// if(DashBoard_canMsg1.B.StartBtn)
+		// {
+		// 	RTD_cnt++;
+		// 	if(RTD_cnt > rtdCntTh)
+		// 	{
+		// 		RTD_flag = FALSE;
+		// 		RTD_cnt = 0;
+		// 	}
+		// }
+		// else if(DashBoard_public.data.tsalOn == FALSE)
+		// {
+		// 	RTD_flag = FALSE;
+		// }
+		if(DashBoard_public.data.tsalOn == FALSE)
 		{
 			RTD_flag = FALSE;
 		}

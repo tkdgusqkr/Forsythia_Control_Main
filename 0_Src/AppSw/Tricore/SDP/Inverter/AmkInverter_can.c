@@ -19,10 +19,10 @@ CanCommunication_Message T_TC275_RR;
 CanCommunication_Message T_TC275_FR;
 CanCommunication_Message T_InvCtr;
 
-CanCommunication_Message T_INV_FL_AMK_Set_Point_log;
-CanCommunication_Message T_INV_RL_AMK_Set_Point_log;
-CanCommunication_Message T_INV_RR_AMK_Set_Point_log;
-CanCommunication_Message T_INV_FR_AMK_Set_Point_log;
+// CanCommunication_Message T_INV_FL_AMK_Set_Point_log;
+// CanCommunication_Message T_INV_RL_AMK_Set_Point_log;
+// CanCommunication_Message T_INV_RR_AMK_Set_Point_log;
+// CanCommunication_Message T_INV_FR_AMK_Set_Point_log;
 CanCommunication_Message T_INV_FL_AMK_Actual_Values1_log;
 CanCommunication_Message T_INV_RL_AMK_Actual_Values1_log;
 CanCommunication_Message T_INV_RR_AMK_Actual_Values1_log;
@@ -61,23 +61,6 @@ amkSetpoint1 INV_FR_AMK_Setpoint1;
 Inv_switch_msg_t Inv_switch_msg;
 
 boolean AmkInverterError = FALSE;
-
-AmkActualValues1_log_t INV_FL_AMK_Actual_Values1_log;
-AmkActualValues1_log_t INV_RL_AMK_Actual_Values1_log;
-AmkActualValues1_log_t INV_RR_AMK_Actual_Values1_log;
-AmkActualValues1_log_t INV_FR_AMK_Actual_Values1_log;
-
-AmkActualValues2_log_t INV_FL_AMK_Actual_Values2_log;
-AmkActualValues2_log_t INV_RL_AMK_Actual_Values2_log;
-AmkActualValues2_log_t INV_RR_AMK_Actual_Values2_log;
-AmkActualValues2_log_t INV_FR_AMK_Actual_Values2_log;
-
-IFX_EXTERN boolean chg0 = FALSE;
-IFX_EXTERN boolean chg1 = FALSE;
-IFX_EXTERN boolean chg2 = FALSE;
-IFX_EXTERN boolean chg3 = FALSE;
-IFX_EXTERN boolean chg4 = FALSE;
-IFX_EXTERN boolean chg5 = FALSE;
 
 void AmkInverter_can_init(void);
 void AmkInverter_can_Run(void);
@@ -216,12 +199,20 @@ void AmkInverter_can_Run(void)
     {
     	INV_FL_AMK_Actual_Values1.RecievedData[0]      =   R_Inverter_FL_1.msg.data[0];
     	INV_FL_AMK_Actual_Values1.RecievedData[1]      =   R_Inverter_FL_1.msg.data[1];
-    }
+
+		// CanCommunication_setMessageData(INV_FL_AMK_Actual_Values1.RecievedData[0],
+		//     INV_FL_AMK_Actual_Values1.RecievedData[1], &T_INV_FL_AMK_Actual_Values1_log);
+		// CanCommunication_transmitMessage(&T_INV_FL_AMK_Actual_Values1_log);
+	}
     if(CanCommunication_receiveMessage(&R_Inverter_FL_2))
     {
         INV_FL_AMK_Actual_Values2.RecievedData[0]      =   R_Inverter_FL_2.msg.data[0];
         INV_FL_AMK_Actual_Values2.RecievedData[1]      =   R_Inverter_FL_2.msg.data[1];
-    }
+
+		// CanCommunication_setMessageData(INV_FL_AMK_Actual_Values2.RecievedData[0],
+		//     INV_FL_AMK_Actual_Values2.RecievedData[1], &T_INV_FL_AMK_Actual_Values2_log);
+		// CanCommunication_transmitMessage(&T_INV_FL_AMK_Actual_Values2_log);
+	}
     if(CanCommunication_receiveMessage(&R_Inverter_RL_1))
     {
         INV_RL_AMK_Actual_Values1.RecievedData[0]      =   R_Inverter_RL_1.msg.data[0];
@@ -246,12 +237,20 @@ void AmkInverter_can_Run(void)
     {
         INV_FR_AMK_Actual_Values1.RecievedData[0]      =   R_Inverter_FR_1.msg.data[0];
         INV_FR_AMK_Actual_Values1.RecievedData[1]      =   R_Inverter_FR_1.msg.data[1];
-    }
+
+		// CanCommunication_setMessageData(INV_FR_AMK_Actual_Values1.RecievedData[0],
+		//     INV_FR_AMK_Actual_Values1.RecievedData[1], &T_INV_FR_AMK_Actual_Values1_log);
+		// CanCommunication_transmitMessage(&T_INV_FR_AMK_Actual_Values1_log);
+	}
     if(CanCommunication_receiveMessage(&R_Inverter_FR_2))
     {
         INV_FR_AMK_Actual_Values2.RecievedData[0]      =   R_Inverter_FR_2.msg.data[0];
         INV_FR_AMK_Actual_Values2.RecievedData[1]      =   R_Inverter_FR_2.msg.data[1];
-    }
+
+		// CanCommunication_setMessageData(INV_FR_AMK_Actual_Values2.RecievedData[0],
+		//     INV_FR_AMK_Actual_Values2.RecievedData[1], &T_INV_FR_AMK_Actual_Values2_log);
+		// CanCommunication_transmitMessage(&T_INV_FR_AMK_Actual_Values2_log);
+	}
 
 	Monitor.InverterErrorState.error_RL = INV_RL_AMK_Actual_Values1.S.AMK_bSError;
 	Monitor.InverterErrorState.error_FL = INV_FL_AMK_Actual_Values1.S.AMK_bSError;
@@ -321,8 +320,8 @@ void AmkInverter_writeMessage(uint16 Value1, uint16 Value2)
     AmkInverter_can_write(&INV_FR_AMK_Setpoint1,T_TC275_FR,Value2);
 
 	// Logging
-	AmkInverter_can_write(&INV_FL_AMK_Setpoint1,T_INV_FL_AMK_Set_Point_log,Value1);
-    AmkInverter_can_write(&INV_FR_AMK_Setpoint1,T_INV_FR_AMK_Set_Point_log,Value2);
+	// AmkInverter_can_write(&INV_FL_AMK_Setpoint1,T_INV_FL_AMK_Set_Point_log,Value1);
+    // AmkInverter_can_write(&INV_FR_AMK_Setpoint1,T_INV_FR_AMK_Set_Point_log,Value2);
     // if (Inv_switch_msg.B.BE1on||Inv_switch_msg.B.BE2on||Inv_switch_msg.B.EFon){
     if(alreadyOn != 0){
         InverterControlSet();
@@ -335,10 +334,7 @@ void AmkInverter_writeMessage2(uint16 Value1, uint16 Value2)
 
     AmkInverter_can_write(&INV_RR_AMK_Setpoint1,T_TC275_RR,Value1);
     AmkInverter_can_write(&INV_RL_AMK_Setpoint1,T_TC275_RL,Value2);
-
-	// Logging
-	AmkInverter_can_write(&INV_FL_AMK_Setpoint1,T_INV_RR_AMK_Set_Point_log,Value1);
-    AmkInverter_can_write(&INV_FR_AMK_Setpoint1,T_INV_RL_AMK_Set_Point_log,Value2);
+	
 }
 
 void AmkInverter_Start(boolean rtdFlag)
@@ -592,10 +588,10 @@ static void setTransmitMessageLog(uint32_t ID, CanCommunication_Message *Tm,uint
 void AMKInverter_initLoggingMessage(void) {
 
 	//Init CAN msg of AMK_Set_Point
-	setTransmitMessageLog((uint32_t)Inverter_FL.ID_AMK_Set + (uint32_t)0x275000, &T_INV_FL_AMK_Set_Point_log,0);
-	setTransmitMessageLog((uint32_t)Inverter_RL.ID_AMK_Set + (uint32_t)0x275000, &T_INV_RL_AMK_Set_Point_log,0);
-	setTransmitMessageLog((uint32_t)Inverter_FR.ID_AMK_Set + (uint32_t)0x275000, &T_INV_FR_AMK_Set_Point_log,0);
-	setTransmitMessageLog((uint32_t)Inverter_RR.ID_AMK_Set + (uint32_t)0x275000, &T_INV_RR_AMK_Set_Point_log,0);
+	// setTransmitMessageLog((uint32_t)Inverter_FL.ID_AMK_Set + (uint32_t)0x275000, &T_INV_FL_AMK_Set_Point_log,0);
+	// setTransmitMessageLog((uint32_t)Inverter_RL.ID_AMK_Set + (uint32_t)0x275000, &T_INV_RL_AMK_Set_Point_log,0);
+	// setTransmitMessageLog((uint32_t)Inverter_FR.ID_AMK_Set + (uint32_t)0x275000, &T_INV_FR_AMK_Set_Point_log,0);
+	// setTransmitMessageLog((uint32_t)Inverter_RR.ID_AMK_Set + (uint32_t)0x275000, &T_INV_RR_AMK_Set_Point_log,0);
 	//Init CAN msg of AMK_Actual_Values1
 	setTransmitMessageLog((uint32_t)Inverter_FL.ID_AMK_Ac1 + (uint32_t)0x275000, &T_INV_FL_AMK_Actual_Values1_log,0);
 	setTransmitMessageLog((uint32_t)Inverter_RL.ID_AMK_Ac1 + (uint32_t)0x275000, &T_INV_RL_AMK_Actual_Values1_log,0);
@@ -606,104 +602,5 @@ void AMKInverter_initLoggingMessage(void) {
 	setTransmitMessageLog((uint32_t)Inverter_RL.ID_AMK_Ac2 + (uint32_t)0x275000, &T_INV_RL_AMK_Actual_Values2_log,0);
     setTransmitMessageLog((uint32_t)Inverter_RR.ID_AMK_Ac2 + (uint32_t)0x275000, &T_INV_RR_AMK_Actual_Values2_log,0);
 	setTransmitMessageLog((uint32_t)Inverter_FR.ID_AMK_Ac2 + (uint32_t)0x275000, &T_INV_FR_AMK_Actual_Values2_log,0);
-
-}
-
-void AMKInverter_runLogging(void) {
-
-	//Log AMK_Actual_Values1
-	INV_FL_AMK_Actual_Values1_log.S.AMK_bReserve = INV_FL_AMK_Actual_Values1.S.AMK_bReserve;
-	INV_FL_AMK_Actual_Values1_log.S.AMK_bSystemReady = INV_FL_AMK_Actual_Values1.S.AMK_bSystemReady;
-	INV_FL_AMK_Actual_Values1_log.S.AMK_bSError = INV_FL_AMK_Actual_Values1.S.AMK_bSError;
-	INV_FL_AMK_Actual_Values1_log.S.AMK_bWarn = INV_FL_AMK_Actual_Values1.S.AMK_bWarn;
-	INV_FL_AMK_Actual_Values1_log.S.AMK_bQuitDcOn = INV_FL_AMK_Actual_Values1.S.AMK_bQuitDcOn;
-	INV_FL_AMK_Actual_Values1_log.S.AMK_bDcOn = INV_FL_AMK_Actual_Values1.S.AMK_bDcOn;
-	INV_FL_AMK_Actual_Values1_log.S.AMK_bQuitInverterOn = INV_FL_AMK_Actual_Values1.S.AMK_bQuitInverterOn;
-	INV_FL_AMK_Actual_Values1_log.S.AMK_bInverterOn = INV_FL_AMK_Actual_Values1.S.AMK_bInverterOn;
-	INV_FL_AMK_Actual_Values1_log.S.AMK_bDerating = INV_FL_AMK_Actual_Values1.S.AMK_bDerating;
-	INV_FL_AMK_Actual_Values1_log.S.AMK_ActualVelocity = INV_FL_AMK_Actual_Values1.S.AMK_ActualVelocity;
-	INV_FL_AMK_Actual_Values1_log.S.AMK_TorqueCurrent = INV_FL_AMK_Actual_Values1.S.AMK_TorqueCurrent;
-	INV_FL_AMK_Actual_Values1_log.S.AMK_MagnetizingCurrent = INV_FL_AMK_Actual_Values1.S.AMK_MagnetizingCurrent;
-
-	INV_RL_AMK_Actual_Values1_log.S.AMK_bReserve = INV_RL_AMK_Actual_Values1.S.AMK_bReserve;
-	INV_RL_AMK_Actual_Values1_log.S.AMK_bSystemReady = INV_RL_AMK_Actual_Values1.S.AMK_bSystemReady;
-	INV_RL_AMK_Actual_Values1_log.S.AMK_bSError = INV_RL_AMK_Actual_Values1.S.AMK_bSError;
-	INV_RL_AMK_Actual_Values1_log.S.AMK_bWarn = INV_RL_AMK_Actual_Values1.S.AMK_bWarn;
-	INV_RL_AMK_Actual_Values1_log.S.AMK_bQuitDcOn = INV_RL_AMK_Actual_Values1.S.AMK_bQuitDcOn;
-	INV_RL_AMK_Actual_Values1_log.S.AMK_bDcOn = INV_RL_AMK_Actual_Values1.S.AMK_bDcOn;
-	INV_RL_AMK_Actual_Values1_log.S.AMK_bQuitInverterOn = INV_RL_AMK_Actual_Values1.S.AMK_bQuitInverterOn;
-	INV_RL_AMK_Actual_Values1_log.S.AMK_bInverterOn = INV_RL_AMK_Actual_Values1.S.AMK_bInverterOn;
-	INV_RL_AMK_Actual_Values1_log.S.AMK_bDerating = INV_RL_AMK_Actual_Values1.S.AMK_bDerating;
-	INV_RL_AMK_Actual_Values1_log.S.AMK_ActualVelocity = INV_RL_AMK_Actual_Values1.S.AMK_ActualVelocity;
-	INV_RL_AMK_Actual_Values1_log.S.AMK_TorqueCurrent = INV_RL_AMK_Actual_Values1.S.AMK_TorqueCurrent;
-	INV_RL_AMK_Actual_Values1_log.S.AMK_MagnetizingCurrent = INV_RL_AMK_Actual_Values1.S.AMK_MagnetizingCurrent;
-
-	INV_RR_AMK_Actual_Values1_log.S.AMK_bReserve = INV_RR_AMK_Actual_Values1.S.AMK_bReserve;
-	INV_RR_AMK_Actual_Values1_log.S.AMK_bSystemReady = INV_RR_AMK_Actual_Values1.S.AMK_bSystemReady;
-	INV_RR_AMK_Actual_Values1_log.S.AMK_bSError = INV_RR_AMK_Actual_Values1.S.AMK_bSError;
-	INV_RR_AMK_Actual_Values1_log.S.AMK_bWarn = INV_RR_AMK_Actual_Values1.S.AMK_bWarn;
-	INV_RR_AMK_Actual_Values1_log.S.AMK_bQuitDcOn = INV_RR_AMK_Actual_Values1.S.AMK_bQuitDcOn;
-	INV_RR_AMK_Actual_Values1_log.S.AMK_bDcOn = INV_RR_AMK_Actual_Values1.S.AMK_bDcOn;
-	INV_RR_AMK_Actual_Values1_log.S.AMK_bQuitInverterOn = INV_RR_AMK_Actual_Values1.S.AMK_bQuitInverterOn;
-	INV_RR_AMK_Actual_Values1_log.S.AMK_bInverterOn = INV_RR_AMK_Actual_Values1.S.AMK_bInverterOn;
-	INV_RR_AMK_Actual_Values1_log.S.AMK_bDerating = INV_RR_AMK_Actual_Values1.S.AMK_bDerating;
-	INV_RR_AMK_Actual_Values1_log.S.AMK_ActualVelocity = INV_RR_AMK_Actual_Values1.S.AMK_ActualVelocity;
-	INV_RR_AMK_Actual_Values1_log.S.AMK_TorqueCurrent = INV_RR_AMK_Actual_Values1.S.AMK_TorqueCurrent;
-	INV_RR_AMK_Actual_Values1_log.S.AMK_MagnetizingCurrent = INV_RR_AMK_Actual_Values1.S.AMK_MagnetizingCurrent;
-
-	INV_FR_AMK_Actual_Values1_log.S.AMK_bReserve = INV_FR_AMK_Actual_Values1.S.AMK_bReserve;
-	INV_FR_AMK_Actual_Values1_log.S.AMK_bSystemReady = INV_FR_AMK_Actual_Values1.S.AMK_bSystemReady;
-	INV_FR_AMK_Actual_Values1_log.S.AMK_bSError = INV_FR_AMK_Actual_Values1.S.AMK_bSError;
-	INV_FR_AMK_Actual_Values1_log.S.AMK_bWarn = INV_FR_AMK_Actual_Values1.S.AMK_bWarn;
-	INV_FR_AMK_Actual_Values1_log.S.AMK_bQuitDcOn = INV_FR_AMK_Actual_Values1.S.AMK_bQuitDcOn;
-	INV_FR_AMK_Actual_Values1_log.S.AMK_bDcOn = INV_FR_AMK_Actual_Values1.S.AMK_bDcOn;
-	INV_FR_AMK_Actual_Values1_log.S.AMK_bQuitInverterOn = INV_FR_AMK_Actual_Values1.S.AMK_bQuitInverterOn;
-	INV_FR_AMK_Actual_Values1_log.S.AMK_bInverterOn = INV_FR_AMK_Actual_Values1.S.AMK_bInverterOn;
-	INV_FR_AMK_Actual_Values1_log.S.AMK_bDerating = INV_FR_AMK_Actual_Values1.S.AMK_bDerating;
-	INV_FR_AMK_Actual_Values1_log.S.AMK_ActualVelocity = INV_FR_AMK_Actual_Values1.S.AMK_ActualVelocity;
-	INV_FR_AMK_Actual_Values1_log.S.AMK_TorqueCurrent = INV_FR_AMK_Actual_Values1.S.AMK_TorqueCurrent;
-	INV_FR_AMK_Actual_Values1_log.S.AMK_MagnetizingCurrent = INV_FR_AMK_Actual_Values1.S.AMK_MagnetizingCurrent;
-	//Log AMK_Actual_Values2
-	INV_FL_AMK_Actual_Values2_log.S.AMK_TempMotor = INV_FL_AMK_Actual_Values2.S.AMK_TempMotor;
-	INV_FL_AMK_Actual_Values2_log.S.AMK_TempInverter = INV_FL_AMK_Actual_Values2.S.AMK_TempInverter;
-	INV_FL_AMK_Actual_Values2_log.S.AMK_ErrorInfo = INV_FL_AMK_Actual_Values2.S.AMK_ErrorInfo;
-	INV_FL_AMK_Actual_Values2_log.S.AMK_TempIGBT = INV_FL_AMK_Actual_Values2.S.AMK_TempIGBT;
-
-	INV_RL_AMK_Actual_Values2_log.S.AMK_TempMotor = INV_RL_AMK_Actual_Values2.S.AMK_TempMotor;
-	INV_RL_AMK_Actual_Values2_log.S.AMK_TempInverter = INV_RL_AMK_Actual_Values2.S.AMK_TempInverter;
-	INV_RL_AMK_Actual_Values2_log.S.AMK_ErrorInfo = INV_RL_AMK_Actual_Values2.S.AMK_ErrorInfo;
-	INV_RL_AMK_Actual_Values2_log.S.AMK_TempIGBT = INV_RL_AMK_Actual_Values2.S.AMK_TempIGBT;
-
-	INV_RR_AMK_Actual_Values2_log.S.AMK_TempMotor = INV_RR_AMK_Actual_Values2.S.AMK_TempMotor;
-	INV_RR_AMK_Actual_Values2_log.S.AMK_TempInverter = INV_RR_AMK_Actual_Values2.S.AMK_TempInverter;
-	INV_RR_AMK_Actual_Values2_log.S.AMK_ErrorInfo = INV_RR_AMK_Actual_Values2.S.AMK_ErrorInfo;
-	INV_RR_AMK_Actual_Values2_log.S.AMK_TempIGBT = INV_RR_AMK_Actual_Values2.S.AMK_TempIGBT;
-
-	INV_FR_AMK_Actual_Values2_log.S.AMK_TempMotor = INV_FR_AMK_Actual_Values2.S.AMK_TempMotor;
-	INV_FR_AMK_Actual_Values2_log.S.AMK_TempInverter = INV_FR_AMK_Actual_Values2.S.AMK_TempInverter;
-	INV_FR_AMK_Actual_Values2_log.S.AMK_ErrorInfo = INV_FR_AMK_Actual_Values2.S.AMK_ErrorInfo;
-	INV_FR_AMK_Actual_Values2_log.S.AMK_TempIGBT = INV_FR_AMK_Actual_Values2.S.AMK_TempIGBT;
-
-	//Set CAN msg of AMK_Actual_Values1
-	CanCommunication_setMessageData(INV_FL_AMK_Actual_Values1_log.TransmitData[0], INV_FL_AMK_Actual_Values1_log.TransmitData[1], &T_INV_FL_AMK_Actual_Values1_log);
-	CanCommunication_setMessageData(INV_RL_AMK_Actual_Values1_log.TransmitData[0], INV_RL_AMK_Actual_Values1_log.TransmitData[1], &T_INV_RL_AMK_Actual_Values1_log);
-	CanCommunication_setMessageData(INV_RR_AMK_Actual_Values1_log.TransmitData[0], INV_RR_AMK_Actual_Values1_log.TransmitData[1], &T_INV_RR_AMK_Actual_Values1_log);
-	CanCommunication_setMessageData(INV_FR_AMK_Actual_Values1_log.TransmitData[0], INV_FR_AMK_Actual_Values1_log.TransmitData[1], &T_INV_FR_AMK_Actual_Values1_log);
-	//Set CAN msg of AMK_Actual_Values2
-	CanCommunication_setMessageData(INV_FL_AMK_Actual_Values2_log.TransmitData[0], INV_FL_AMK_Actual_Values2_log.TransmitData[1], &T_INV_FL_AMK_Actual_Values2_log);
-	CanCommunication_setMessageData(INV_RL_AMK_Actual_Values2_log.TransmitData[0], INV_RL_AMK_Actual_Values2_log.TransmitData[1], &T_INV_RL_AMK_Actual_Values2_log);
-	CanCommunication_setMessageData(INV_RR_AMK_Actual_Values2_log.TransmitData[0], INV_RR_AMK_Actual_Values2_log.TransmitData[1], &T_INV_RR_AMK_Actual_Values2_log);
-	CanCommunication_setMessageData(INV_FR_AMK_Actual_Values2_log.TransmitData[0], INV_FR_AMK_Actual_Values2_log.TransmitData[1], &T_INV_FR_AMK_Actual_Values2_log);
-
-	//Transmit CAM msg of AMK_Actual_Values1 to node0(main bus)
-	CanCommunication_transmitMessage(&T_INV_FL_AMK_Actual_Values1_log);
-	CanCommunication_transmitMessage(&T_INV_RL_AMK_Actual_Values1_log);
-	CanCommunication_transmitMessage(&T_INV_RR_AMK_Actual_Values1_log);
-	CanCommunication_transmitMessage(&T_INV_FR_AMK_Actual_Values1_log);
-	//Transmit CAM msg of AMK_Actual_Values2 to node0(main bus)
-	CanCommunication_transmitMessage(&T_INV_FL_AMK_Actual_Values2_log);
-	CanCommunication_transmitMessage(&T_INV_RL_AMK_Actual_Values2_log);
-	CanCommunication_transmitMessage(&T_INV_RR_AMK_Actual_Values2_log);
-	CanCommunication_transmitMessage(&T_INV_FR_AMK_Actual_Values2_log);
 
 }
