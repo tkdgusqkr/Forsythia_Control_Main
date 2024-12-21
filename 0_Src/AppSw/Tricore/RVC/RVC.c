@@ -78,7 +78,7 @@ TODO:
 #define REGEN_MUL	1	//2
 
 // #define POWER_LIM				80000	//80kW
-#define POWER_LIM				40000	//80kW
+#define POWER_LIM				65000	//80kW
 // #define CURRENT_LIM_SET_VAL		10		//10A
 #define CURRENT_LIM_SET_VAL 	5       //5A
 
@@ -112,7 +112,7 @@ TODO:
 
 /*********************** Global Variables ****************************/
 static const float32 frontDist_initial = 0.35f;
-// static boolean rtds = FALSE;
+ static boolean rtds = FALSE;
 
 RVC_t RVC = 
 {
@@ -121,6 +121,7 @@ RVC_t RVC =
     .torque.rearLeft = 0,
     .torque.rearRight = 0,
 	.torque.isRegenOn = REGEN_ON_INIT,
+	.torque.deltaTorqueLimit = 200,
 
 	.calibration.leftAcc.mul = 1,
 	.calibration.leftAcc.offset = 0,
@@ -237,7 +238,7 @@ void RVC_run_10ms(void)
 	RVC_pollGpi(&RVC.airNegative);
 	RVC_pollGpi(&RVC.brakePressureOn);
 	RVC_pollGpi(&RVC.brakeSwitch);
-	RVC_pollGpi(&RVC.tsalOff);
+	RVC_pollGpi(&RVC.tsalOn);
 	RVC_pollGpi(&RVC.sdcSenBspd);
 	RVC_pollGpi(&RVC.sdcSenImd);
 	RVC_pollGpi(&RVC.sdcSenAms);
@@ -387,7 +388,7 @@ IFX_STATIC void RVC_initGpio(void)
 	gpioInputConfig.bufferLen = Gpio_Debounce_BufferLength_10;
 	gpioInputConfig.inputMode = IfxPort_InputMode_noPullDevice;
 	gpioInputConfig.port = &TSAL_RED_ON_5V;
-	Gpio_Debounce_initInput(&RVC.tsalOff.debounce, &gpioInputConfig);
+	Gpio_Debounce_initInput(&RVC.tsalOn.debounce, &gpioInputConfig);
 
 	gpioInputConfig.bufferLen = Gpio_Debounce_BufferLength_10;
 	gpioInputConfig.inputMode = IfxPort_InputMode_noPullDevice;
@@ -603,7 +604,7 @@ IFX_INLINE void RVC_updateReadyToDriveSignal(void)
 		IfxPort_setPinLow(FWD_OUT.port, FWD_OUT.pinIndex);
 	}
 	*/
-	static boolean rtds = FALSE;
+//	static boolean rtds = FALSE;
 	static AmkState_t curAmkState = AmkState_S0;
 	static AmkState_t pastAmkState = AmkState_S0;
 
@@ -687,14 +688,14 @@ IFX_INLINE void RVC_slipComputation(void)
 
 IFX_INLINE void RVC_getTorqueRequired(void)
 {
-	// if(rtds != TRUE && SDP_PedalBox.apps.isValueOk)		//APPS Plausibility check
-	// {
-	// 	RVC.torque.controlled = (RVC.torque.desired = RVC_PedalMap_lut_getResult(SDP_PedalBox.apps.pps));
-	// }
-	if(SDP_PedalBox.apps.isValueOk) // APPS Plausibility check
-	{
-		RVC.torque.controlled = (RVC.torque.desired = RVC_PedalMap_lut_getResult(SDP_PedalBox.apps.pps));
-	}
+	 if(rtds != TRUE && SDP_PedalBox.apps.isValueOk)		//APPS Plausibility check
+	 {
+	 	RVC.torque.controlled = (RVC.torque.desired = RVC_PedalMap_lut_getResult(SDP_PedalBox.apps.pps));
+	 }
+//	if(SDP_PedalBox.apps.isValueOk) // APPS Plausibility check
+//	{
+//		RVC.torque.controlled = (RVC.torque.desired = RVC_PedalMap_lut_getResult(SDP_PedalBox.apps.pps));
+//	}
 	else
 	{
 		RVC.torque.controlled = (RVC.torque.desired = 0);		//APPS Fail
@@ -761,6 +762,8 @@ IFX_INLINE void RVC_torqueLimit(void)
 	{
 		dischargeLimit = RVC_public.bms.data.dischargeLimit;
 	}
+
+//	dischargeLimit = 115;
 
 	float32 currentLimitByPower = RVC.power.currentLimit;
 
@@ -937,7 +940,8 @@ IFX_INLINE void RVC_updatePwmSignal(void)
 
 IFX_INLINE void VariableUpdateRoutine_steeringWheel(void)
 {
-	SteeringWheel_public.shared.data.vehicleSpeed = SDP_WheelSpeed.velocity.chassis;
+	SteeringWheel_public.shared.data.vehicleSpeed_FL = RVC.AmkMonitor.MotorVelocity.velocity_FL;
+	SteeringWheel_public.shared.data.vehicleSpeed_FR = RVC.AmkMonitor.MotorVelocity.velocity_FR;
 	SteeringWheel_public.shared.data.apps = SDP_PedalBox.apps.pps;
 	SteeringWheel_public.shared.data.bpps = SDP_PedalBox.bpps.pps;
 	if(RVC.readyToDrive == RVC_ReadyToDrive_status_run)
@@ -956,6 +960,8 @@ IFX_INLINE void VariableUpdateRoutine_steeringWheel(void)
 	else 
 		SteeringWheel_public.shared.data.bppsError = TRUE;
 	SteeringWheel_public.shared.data.lvBatteryVoltage = RVC.LvBattery_Voltage.value;
+	SteeringWheel_public.shared.data.shock0 = SDP_ShockValue.shock0.pps;
+	SteeringWheel_public.shared.data.shock1 = SDP_ShockValue.shock1.pps;
 }
 
 IFX_INLINE void VariableUpdateRoutine_dashboard(void)
@@ -965,7 +971,7 @@ IFX_INLINE void VariableUpdateRoutine_dashboard(void)
 	DashBoard_public.shared.data.bspdOk = RVC.bspdOk.value;
 	DashBoard_public.shared.data.sdcSenFinal = RVC.sdcSenFinal.value;
 	DashBoard_public.shared.data.brakeOn = RVC.brakeOn.tot;
-	DashBoard_public.shared.data.tsalOn = !RVC.tsalOff.value;
+	DashBoard_public.shared.data.tsalOn = RVC.tsalOn.value;
 }
 
 volatile uint32 updateErrorCount_steeringWheel = 0;
@@ -1013,4 +1019,11 @@ IFX_INLINE void RVC_updateSharedVariable(void)
 		}
 		updateErrorCount_dashboard = 0;
 	}
+}
+
+sint16 RVC_rigingSlopeLimit(sint16 preValue, sint16 curValue)
+{
+	if(curValue - preValue > RVC.torque.deltaTorqueLimit)	return RVC.torque.deltaTorqueLimit + preValue;
+
+	return curValue;
 }

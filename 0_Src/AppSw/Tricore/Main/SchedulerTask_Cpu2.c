@@ -50,12 +50,20 @@ float32 tpsRr;
 
 boolean brakeOn = FALSE;
 
-sint16 valueFl;
-sint16 valueFr;
-sint16 valueRl;
-sint16 valueRr;
+sint16 preValueFl;
+sint16 preValueFr;
+sint16 preValueRl;
+sint16 preValueRr;
+
+sint16 curValueFl;
+sint16 curValueFr;
+sint16 curValueRl;
+sint16 curValueRr;
 
 int value = 0;
+
+uint16_t test_task2_10ms_cnt = 0;
+
 // boolean RTD_flag;
 /******************************************************************************/
 /*-------------------------Function Prototypes--------------------------------*/
@@ -105,24 +113,39 @@ void Task_core2_1ms(void)
 		IfxCpu_releaseMutex(&AmkInverterPublic.mutex);
 	}
 
-	valueFl = ((float32)AMK_TORQUE_LIM / (100.0f) * tpsFl);
-	valueFr = ((float32)AMK_TORQUE_LIM / (100.0f) * tpsFr);
-	valueRl = ((float32)AMK_TORQUE_LIM / (100.0f) * tpsRl);
-	valueRr = ((float32)AMK_TORQUE_LIM / (100.0f) * tpsRr);
+	curValueFl = ((float32)AMK_TORQUE_LIM / (100.0f) * tpsFl);
+	curValueFr = ((float32)AMK_TORQUE_LIM / (100.0f) * tpsFr);
+	curValueRl = ((float32)AMK_TORQUE_LIM / (100.0f) * tpsRl);
+	curValueRr = ((float32)AMK_TORQUE_LIM / (100.0f) * tpsRr);
 
 
 	// AmkInverter_writeMessage(value,value);
 	// AmkInverter_writeMessage2(value,value);
 
-	if(valueFl < 0)	valueFl = 0;
-	if(valueFr < 0)	valueFr = 0;
-	if(valueRl < 0)	valueRl = 0;
-	if(valueRr < 0)	valueRr = 0;
+	curValueFl = RVC_rigingSlopeLimit(preValueFl, curValueFl);
+	curValueFr = RVC_rigingSlopeLimit(preValueFr, curValueFr);
+	curValueRl = RVC_rigingSlopeLimit(preValueRl, curValueRl);
+	curValueRr = RVC_rigingSlopeLimit(preValueRr, curValueRr);
 
+	if(curValueFl < 0)	curValueFl = 0;
+	if(curValueFr < 0)	curValueFr = 0;
+	if(curValueRl < 0)	curValueRl = 0;
+	if(curValueRr < 0)	curValueRr = 0;
 
-	AmkInverter_writeMessage(valueFl,valueFr);
-	AmkInverter_writeMessage2(valueRl,valueRr);
-	
+	test_task2_10ms_cnt+=1;
+
+	if(test_task2_10ms_cnt == 10)
+	{
+		test_task2_10ms_cnt = 0;
+		AmkInverter_writeMessage(curValueFl,curValueFr);
+		AmkInverter_writeMessage2(curValueRl,curValueRr);
+
+		preValueFl = curValueFl;
+		preValueFr = curValueFr;
+		preValueRl = curValueRl;
+		preValueRr = curValueRr;
+	}
+
 	// else if (task2_10ms_counter ==15)
 	// SDP_DashBoardCan_run_10ms();
 

@@ -20,7 +20,8 @@
 /************************* Data Structures ***************************/
 typedef struct 
 {
-	float32 vehicleSpeed;
+	sint16 vehicleSpeed_FL;
+	sint16 vehicleSpeed_FR;
 	float32 apps;
 	float32 bpps;
 	boolean isReadyToDrive;
@@ -30,6 +31,8 @@ typedef struct
 	boolean appsError;
 	boolean bppsError;
 	float32 lvBatteryVoltage;
+	float32 shock0;
+	float32 shock1;
 }SteeringWheel_public_data_t;
 
 typedef struct 

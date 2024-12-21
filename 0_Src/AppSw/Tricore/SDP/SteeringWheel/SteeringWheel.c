@@ -81,7 +81,9 @@ void SteeringWheel_run_xms_c2(void)
 	}
 
 	/* Data parsing */
-	SteeringWheel.canMsg1.S.vehicleSpeed = (uint8)SteeringWheel_public.data.vehicleSpeed;
+	sint16 low_speed = (SteeringWheel_public.data.vehicleSpeed_FL > SteeringWheel_public.data.vehicleSpeed_FR ? SteeringWheel_public.data.vehicleSpeed_FR : SteeringWheel_public.data.vehicleSpeed_FL);
+	float32 tmp_speed = ((low_speed * (2.0 * 3.14 / 60.0) / 14.665) * 0.254 * 3.6);
+	SteeringWheel.canMsg1.S.vehicleSpeed = (uint8)tmp_speed;
 	SteeringWheel.canMsg1.S.lowestVoltage = OrionBms2.msg3.lowVoltage;
 	SteeringWheel.canMsg1.S.highestTemp = OrionBms2.msg3.highTemp;
 	SteeringWheel.canMsg1.S.bmsTemp = OrionBms2.msg3.bmsTemp;
@@ -111,10 +113,8 @@ void SteeringWheel_run_xms_c2(void)
 	SteeringWheel.canMsg2.S.lvBatteryVoltage = (uint16)(SteeringWheel_public.data.lvBatteryVoltage*100);
 	SteeringWheel.canMsg2.S.accumulatorVoltage = OrionBms2.msg1.packVoltage;
 
-	SteeringWheel.canMsg3.S.inverterFLTemp = INV_FL_AMK_Actual_Values2.S.AMK_TempInverter;
-	SteeringWheel.canMsg3.S.motorFLTemp = INV_FL_AMK_Actual_Values2.S.AMK_TempMotor;
-	SteeringWheel.canMsg3.S.inverterFRTemp = INV_FR_AMK_Actual_Values2.S.AMK_TempInverter;
-	SteeringWheel.canMsg3.S.motorFRTemp = INV_FR_AMK_Actual_Values2.S.AMK_TempMotor;
+	SteeringWheel.canMsg3.S.shock0 = (uint16)(SteeringWheel_public.data.shock0 * 10000);
+	SteeringWheel.canMsg3.S.shock1 = (uint16)(SteeringWheel_public.data.shock1 * 10000);
 	SteeringWheel.canMsg3.S.packCurrent = OrionBms2.msg1.packCurrent;
 	SteeringWheel.canMsg3.S.packVoltage = OrionBms2.msg1.packVoltage;
 

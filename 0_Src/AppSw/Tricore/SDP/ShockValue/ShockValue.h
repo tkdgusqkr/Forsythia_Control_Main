@@ -33,6 +33,49 @@ typedef struct{
     float rearHeave;
 }ShockValue_t;
 
+typedef struct
+{
+	float32 start;
+	float32 end;
+	float32 deadzone;
+	boolean reversed;
+
+	float32 center;
+	float32 opposite;
+	float32 len;
+
+
+	float32 dzstart;
+	float32 dzend;
+	float32 dzlen;
+
+}SDP_ShockValue_sensorConfig_t;
+
+typedef struct
+{
+	SDP_ShockValue_sensorConfig_t	config;
+	float32						pedalPercent;
+	boolean						isValueOk;
+}SDP_ShockValue_sensor_t;
+
+typedef struct
+{
+	SDP_ShockValue_sensor_t		shock0;
+	SDP_ShockValue_sensor_t		shock1;
+}SDP_ShockValue_pps_t;
+
+typedef struct
+{
+	float32 pps;
+	boolean isValueOk;
+}SDP_ShockValue_struct_t;
+
+typedef struct
+{
+	SDP_ShockValue_struct_t			shock0;
+	SDP_ShockValue_struct_t			shock1;
+}SDP_ShockValue_t;
+
 /*
 typedef union
 {
@@ -46,9 +89,12 @@ typedef union
 }ShockCanMsg_data_log_t;
 */
 
-IFX_EXTERN ShockValue_t shockValue;
+IFX_EXTERN SDP_ShockValue_t		SDP_ShockValue;
 IFX_EXTERN ShockCanMsg_data_t ShockCanMsgFront;
 IFX_EXTERN ShockCanMsg_data_t ShockCanMsgRear;
+
+IFX_EXTERN AdcSensor SHOCK0;
+IFX_EXTERN AdcSensor SHOCK1;
 
 // IFX_EXTERN ShockCanMsg_data_log_t ShockCanMsgFront_log;
 // IFX_EXTERN ShockCanMsg_data_log_t ShockCanMsgRear_log;

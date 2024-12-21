@@ -56,10 +56,12 @@ typedef union
 		// uint8 motorRRTemp;			//byte1;		//Inverter
 		// uint8 inverterFRTemp;        //byte2;		//Inverter
 		// uint8 motorFRTemp;			//byte3;		//Inverter
-		uint8 inverterFLTemp;       // byte0;		//Inverter
-		uint8 motorFLTemp;          // byte1;		//Inverter
-		uint8 inverterFRTemp;       // byte2;		//Inverter
-		uint8 motorFRTemp;          // byte3;		//Inverter
+//		uint8 inverterFLTemp;       // byte0;		//Inverter
+//		uint8 motorFLTemp;          // byte1;		//Inverter
+//		uint8 inverterFRTemp;       // byte2;		//Inverter
+//		uint8 motorFRTemp;          // byte3;		//Inverter
+		uint16 shock0;
+		uint16 shock1;
 		uint16 packCurrent;			// byte4~5;		//BMS
 		uint16 packVoltage;			// byte6~7;		//BMS
 	}S;

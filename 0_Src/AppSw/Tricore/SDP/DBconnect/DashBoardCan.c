@@ -171,6 +171,7 @@ void SDP_DashBoardCan_run_10ms(void)
 		// {
 		// 	RTD_flag = FALSE;
 		// }
+
 		if(DashBoard_public.data.tsalOn == FALSE)
 		{
 			RTD_flag = FALSE;

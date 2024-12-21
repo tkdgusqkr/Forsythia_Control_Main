@@ -7,6 +7,7 @@
 
 /* Includes */
 #include "TorqueVectoring.h"
+#include <math.h>
 
 /* Macros */
 #define TVOPEN_LSD_ON		FALSE
@@ -14,6 +15,56 @@
 
 /* Global Variables */
 IFX_EXTERN RVC_t RVC;
+
+RVC_TV_t RVC_TV =
+{
+		.cur_delta_rpm = 0,
+
+		.percent_rpm = 0,
+
+		.min_delta_rpm = 500,
+		.max_delta_rpm = 2500,
+
+		.pre_tv_status = RVC_TV_status_neutral,
+		.cur_tv_status = RVC_TV_status_neutral,
+};
+void RVC_TorqueVectoring_reset(void)
+{
+	RVC_TV.percent_rpm = 0;
+}
+
+void RVC_TorqueVectoring_set(void)
+{
+	float32 tmp_delta_rpm = (float32)(RVC.AmkMonitor.MotorVelocity.velocity_FR - RVC.AmkMonitor.MotorVelocity.velocity_FL);
+
+	if(tmp_delta_rpm > RVC_TV.min_delta_rpm)
+	{
+		RVC_TV.cur_tv_status = RVC_TV_status_left;
+		RVC_TV.cur_delta_rpm = tmp_delta_rpm;
+	}
+	else if(tmp_delta_rpm < -RVC_TV.min_delta_rpm)
+	{
+		RVC_TV.cur_tv_status = RVC_TV_status_right;
+		RVC_TV.cur_delta_rpm = -tmp_delta_rpm;
+	}
+	else
+	{
+		RVC_TV.cur_tv_status = RVC_TV_status_neutral;
+		RVC_TV.cur_delta_rpm = fabs(tmp_delta_rpm);
+	}
+
+	if((fabs(RVC_TV.cur_tv_status - RVC_TV.pre_tv_status) == 2) || RVC_TV.cur_delta_rpm > RVC_TV.max_delta_rpm)
+	{
+		RVC_TV.cur_tv_status = RVC_TV_status_neutral;
+	}
+
+	if(RVC_TV.cur_tv_status != RVC_TV_status_neutral)
+	{
+		RVC_TV.percent_rpm = (RVC_TV.cur_delta_rpm - RVC_TV.min_delta_rpm) / (RVC_TV.max_delta_rpm - RVC_TV.min_delta_rpm) * 100;
+	}
+
+	RVC_TV.pre_tv_status = RVC_TV.cur_tv_status;
+}
 
 /* Function Implementation */
 void RVC_TorqueVectoring_run_modeOpen(void)
@@ -38,10 +89,51 @@ void RVC_TorqueVectoring_run_modeOpen(void)
 	// RVC.torque.rearLeft = RVC.torque.controlled;
 	// RVC.torque.rearRight = RVC.torque.controlled;
 
-	RVC.torque.frontLeft = RVC.torque.controlled;
-	RVC.torque.frontRight = RVC.torque.controlled;
-	RVC.torque.rearLeft = RVC.torque.controlled;
-	RVC.torque.rearRight = RVC.torque.controlled;
+	RVC_TorqueVectoring_set();
+
+	if(TVOPEN_LSD_ON == FALSE)
+	{
+		RVC.torque.frontLeft = RVC.torque.controlled;
+		RVC.torque.frontRight = RVC.torque.controlled;
+		RVC.torque.rearLeft = RVC.torque.controlled;
+		RVC.torque.rearRight = RVC.torque.controlled;
+	}
+	else
+	{
+		if(RVC_TV.cur_tv_status == RVC_TV_status_left)
+		{
+			RVC.torque.frontLeft = RVC.torque.controlled;
+			RVC.torque.frontRight = RVC.torque.controlled - RVC_TV.percent_rpm;
+			RVC.torque.rearLeft = RVC.torque.controlled;
+			RVC.torque.rearRight = RVC.torque.controlled - RVC_TV.percent_rpm;
+		}
+		else if(RVC_TV.cur_tv_status == RVC_TV_status_right)
+		{
+			RVC.torque.frontLeft = RVC.torque.controlled - RVC_TV.percent_rpm;
+			RVC.torque.frontRight = RVC.torque.controlled;
+			RVC.torque.rearLeft = RVC.torque.controlled - RVC_TV.percent_rpm;
+			RVC.torque.rearRight = RVC.torque.controlled;
+		}
+		else
+		{
+			RVC.torque.frontLeft = RVC.torque.controlled;
+			RVC.torque.frontRight = RVC.torque.controlled;
+			RVC.torque.rearLeft = RVC.torque.controlled;
+			RVC.torque.rearRight = RVC.torque.controlled;
+
+			RVC_TorqueVectoring_reset();
+		}
+	}
+
+	if(RVC.torque.frontLeft > 100)	RVC.torque.frontLeft = 100;
+	if(RVC.torque.frontRight > 100)	RVC.torque.frontRight = 100;
+	if(RVC.torque.rearLeft > 100)	RVC.torque.rearLeft = 100;
+	if(RVC.torque.rearRight > 100)	RVC.torque.rearRight = 100;
+
+	if(RVC.torque.frontLeft < 0)	RVC.torque.frontLeft = 0;
+	if(RVC.torque.frontRight < 0)	RVC.torque.frontRight = 0;
+	if(RVC.torque.rearLeft < 0)	RVC.torque.rearLeft = 0;
+	if(RVC.torque.rearRight < 0)	RVC.torque.rearRight = 0;
 
 	// if(TVOPEN_LSD_ON == TRUE)
 	// {

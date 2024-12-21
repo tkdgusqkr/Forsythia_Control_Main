@@ -64,7 +64,7 @@ typedef struct
 	RVC_Gpi_t airNegative;
 	RVC_Gpi_t brakePressureOn;
 	RVC_Gpi_t brakeSwitch;
-	RVC_Gpi_t tsalOff;
+	RVC_Gpi_t tsalOn;
 	RVC_Gpi_t sdcSenBspd;
 	RVC_Gpi_t sdcSenImd;
 	RVC_Gpi_t sdcSenAms;
@@ -121,6 +121,8 @@ typedef struct
 		float32 frontDist;	//0.0 ~ 0.5: 0% ~ 50% front torque distribution
 
 		boolean isRegenOn;
+
+		sint16 deltaTorqueLimit;
 	} torque;
 
 	struct
